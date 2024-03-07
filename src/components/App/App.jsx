@@ -1,43 +1,46 @@
 import { useState, useEffect } from 'react';
+import Modal from 'react-modal';
+import axios from 'axios';
 
-import ContactForm from '../ContactForm/ContactForm';
-import SearchBox from '../SearchBox/SearchBox';
-import ContactList from '../ContactList/ContactList';
+import { Triangle } from 'react-loader-spinner';
 
-import css from './App.module.css';
+import SearchBar from '../SearchBar/SearchBar';
+import ImageGallery from '../ImageGallery/ImageGallery';
 
-import initialContacts from '../../contacts.json';
+// import css from './App.module.css';
 
 const App = () => {
-  const [contacts, setContactList] = useState(() => {
-    const storedContacts = JSON.parse(localStorage.getItem('contacts'));
-    return storedContacts || initialContacts;
-  });
+  const [images, setImages] = useState([]);
   useEffect(() => {
-    localStorage.setItem('contacts', JSON.stringify(contacts));
-  }, [contacts]);
+    // 1. Оголошуємо асинхронну функцію
+    async function fetchImages() {
+      const response = await axios.get(
+        'https://api.unsplash.com/photos/?client_id=DCtBix4SwiSWaQzaGpttYzdj0XBjC4cDhCkRQNr_cSQ'
+        // DCtBix4SwiSWaQzaGpttYzdj0XBjC4cDhCkRQNr_cSQ
+      );
+      console.log(response.data);
+      setImages(response.data);
+    }
 
-  const addContact = newContact => {
-    setContactList(prevContacts => [...prevContacts, newContact]);
-  };
-  const deleteContact = contactId => {
-    setContactList(prevContacts => {
-      return prevContacts.filter(contact => contact.id !== contactId);
-    });
-  };
-
-  const [searchBarFilter, setFilter] = useState('');
-
-  const visibleContcats = contacts.filter(contact =>
-    contact.name.toLowerCase().includes(searchBarFilter.toLowerCase())
-  );
+    // 2. Викликаємо її одразу після оголошення
+    fetchImages();
+  }, []);
 
   return (
-    <div className={css.container}>
-      <h1>Phonebook</h1>
-      <ContactForm onAddContact={addContact} />
-      <SearchBox value={searchBarFilter} onSearch={setFilter} />
-      <ContactList visibleContcats={visibleContcats} onDelete={deleteContact} />
+    <div>
+      <ImageGallery />
+      {images && (
+        <ul>
+          {images.map(({ id, urls, alt_description }) => (
+            <li key={id}>
+              <a href={urls.full} target="_blank" rel="noreferrer noopener">
+                {alt_description}
+              </a>
+            </li>
+          ))}
+        </ul>
+      )}
+      {/* <SearchBar onSubmit={onSubmit}></SearchBar> */}
     </div>
   );
 };
