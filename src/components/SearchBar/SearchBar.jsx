@@ -1,20 +1,30 @@
-// import toast, { Toaster } from 'react-hot-toast';
-const SearchBar = ({ onSubmit }) => {
+import { Field, Form, Formik } from 'formik';
+import css from './SearchBar.module.css';
+import { CiSearch } from 'react-icons/ci';
+const SearchBar = ({ onSearch }) => {
   return (
-    <header>
-      <form>
-        <input
-          type="text"
-          autoComplete="off"
-          autoFocus
-          placeholder="Search images and photos"
-        />
-        <button type="submit">Search</button>
-        <div>
-          {/* <Toaster position="top-center" reverseOrder={false} /> */}
-        </div>
-      </form>
-    </header>
+    <>
+      <header className={css.galleryHeader}>
+        <Formik
+          initialValues={{ query: '' }}
+          onSubmit={(values, actions) => {
+            onSearch(values.query);
+            actions.resetForm();
+          }}
+        >
+          <Form className={css.searchForm}>
+            <Field
+              name="query"
+              className={css.formInput}
+              placeholder="Search images and photos"
+            />
+            <button type="submit" className={css.searchBtn}>
+              <CiSearch />
+            </button>
+          </Form>
+        </Formik>
+      </header>
+    </>
   );
 };
 
